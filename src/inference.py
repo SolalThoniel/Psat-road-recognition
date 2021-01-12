@@ -1,7 +1,9 @@
 import torch
 import torchvision.transforms as transforms
 from torchvision.models import resnet34, resnet50, resnet101
-from src.load_data import image_loader, DATASET_RESOLUTION_SMALL, DATASET_RESOLUTION_MEDIUM, DATASET_RESOLUTION_LARGE, CLASSES
+from src.load_data import image_loader, DATASET_RESOLUTION_SMALL, DATASET_RESOLUTION_MEDIUM, DATASET_RESOLUTION_LARGE,\
+    CLASSES_LABELS
+
 
 # images = le tableau d'images
 # resolution = une des 3 constantes de résolution dans load_data.py
@@ -68,6 +70,6 @@ def inference(images, resolution, resnet_layers=34):
             image.to(device)
             outputs = net(image)
             _, predicted = torch.max(outputs, 1)
-            results.append(CLASSES[predicted])
+            results.append(CLASSES_LABELS[predicted])
 
     return results

@@ -2,13 +2,17 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision.models import resnet34, resnet50, resnet101
-from src import load_data
+from src.load_data import Data, \
+    DATASET_RESOLUTION_SMALL, DATASET_RESOLUTION_MEDIUM, DATASET_RESOLUTION_LARGE, CLASSES_LABELS
 
 
 def run():
     # Hyperparameters
     num_epochs = 10
     batch_size = 10
+    valid_size = 0.2
+    dataset_resolution = DATASET_RESOLUTION_MEDIUM
+    resnet_layers = 101
     learning_rate = 0.01
     momentum = 0.9
     step_size = 5
@@ -18,10 +22,15 @@ def run():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # Loading Data
-    data_loader = load_data.Data(batch_size=batch_size)
+    data_loader = Data(batch_size=batch_size, valid_size=valid_size, dataset_resolution=dataset_resolution)
 
     # Loading Model
-    net = resnet50()
+    if resnet_layers == 50:
+        net = resnet50()
+    elif resnet_layers == 101:
+        net = resnet101()
+    else:
+        net = resnet34()
     net.to(device)
 
     # Loss Function
@@ -76,7 +85,7 @@ def run():
     print('Finished Training')
 
 
-def inference(data_class, net, device, mode='Validation'):
+def inference(data_class: Data, net, device, mode='Validation'):
     if mode == 'Validation':
         data_loader = data_class.valid_loader
     else:
@@ -106,9 +115,8 @@ def inference(data_class, net, device, mode='Validation'):
 
     for i in range(5):
         print('Accuracy of %5s : %2d %%' % (
-            data_class.classes[i], 100 * class_correct[i] / class_total[i]))
+            CLASSES_LABELS[i], 100 * class_correct[i] / class_total[i]))
 
 
 if __name__ == '__main__':
     run()
-

@@ -7,9 +7,26 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from torchsampler import ImbalancedDatasetSampler
 from PIL import Image
 from imgaug import augmenters as iaa
-from enum import Enum
 
 from src import utils
+
+CLASSES_LABELS = ['piste-cyclable', 'route', 'sentier', 'trottoir', 'voie-partagee']
+
+DATASET_RESOLUTION_SMALL = {
+    'train_dir': '../data/classified-images-80x45/train_images',
+    'test_dir': '../data/classified-images-80x45/test_images',
+    'padding': [74, 90, 73, 89],
+}
+DATASET_RESOLUTION_MEDIUM = {
+    'train_dir': '../data/classified-images-160x90/train_images',
+    'test_dir': '../data/classified-images-160x90/test_images',
+    'padding': [32, 67]
+}
+DATASET_RESOLUTION_LARGE = {
+    'train_dir': '../data/classified-images-320x180/train_images',
+    'test_dir': '../data/classified-images-320x180/test_images',
+    'padding': [0, 22]
+}
 
 
 def image_loader(loader, image):
@@ -34,27 +51,12 @@ class ImgAugTransform:
         return Image.fromarray(aug_img)
 
 
-class DatasetResolution(Enum):
-    SMALL = {
-        'train_dir': '../data/classified-images-80x45/train_images',
-        'test_dir': '../data/classified-images-80x45/test_images',
-        'padding': [74, 90, 73, 89],
-    },
-    MEDIUM = {
-        'train_dir': '../data/classified-images-160x90/train_images',
-        'test_dir': '../data/classified-images-160x90/test_images',
-        'padding': [32, 67]
-    },
-    LARGE = {
-        'train_dir': '../data/classified-images-320x180/train_images',
-        'test_dir': '../data/classified-images-320x180/test_images',
-        'padding': [0, 22]
-    }
-
-
 class Data:
 
-    def __init__(self, batch_size=4, valid_size=0.2, dataset_resolution=DatasetResolution.MEDIUM):
+    def __init__(self, batch_size=4, valid_size=0.2, dataset_resolution=None):
+
+        if dataset_resolution is None:
+            dataset_resolution = DATASET_RESOLUTION_MEDIUM
 
         train_dir = dataset_resolution.get('train_dir')
         test_dir = dataset_resolution.get('test_dir')
@@ -85,23 +87,21 @@ class Data:
                                                         num_workers=2)
         self.test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, shuffle=True, num_workers=2)
 
-        self.classes = ('piste-cyclable', 'route', 'sentier', 'trottoir', 'voie-partagee')
-
 
 if __name__ == '__main__':
     data_loader = Data()
     data_iter = iter(data_loader.train_loader)
     images, labels = data_iter.next()
     utils.imshow(torchvision.utils.make_grid(images))
-    print('GroundTruth: ', ' '.join('%5s' % data_loader.classes[labels[j]] for j in range(4)))
+    print('GroundTruth: ', ' '.join('%5s' % CLASSES_LABELS[labels[j]] for j in range(4)))
 
     data_iter = iter(data_loader.test_loader)
     images, labels = data_iter.next()
     utils.imshow(torchvision.utils.make_grid(images))
-    print('GroundTruth: ', ' '.join('%5s' % data_loader.classes[labels[j]] for j in range(4)))
+    print('GroundTruth: ', ' '.join('%5s' % CLASSES_LABELS[labels[j]] for j in range(4)))
 
     print('Distribution of classes in train dataset:')
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     labels = [label for _, label in data_loader.train_loader.dataset.imgs]
     class_labels, counts = np.unique(labels, return_counts=True)
     ax.bar(class_labels, counts)
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     plt.show()
 
     print('Distribution of classes in test dataset:')
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     labels = [label for _, label in data_loader.test_loader.dataset.imgs]
     class_labels, counts = np.unique(labels, return_counts=True)
     ax.bar(class_labels, counts)
