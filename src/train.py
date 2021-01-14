@@ -34,6 +34,7 @@ def run():
     net.to(device)
 
     # Loss Function
+    #TODO : Try different loss function
     criterion = nn.CrossEntropyLoss()
 
     # Optimizer
@@ -79,7 +80,7 @@ def run():
 
         scheduler.step()
 
-        path = '../epochs/road_recognition_' + str(epoch) + '.pth'
+        path = '../epochs/'+dataset_resolution.get('resolution')+'/'+str(resnet_layers)+'/road_recognition_' + str(epoch) + '.pth'
         torch.save(net.state_dict(), path)
 
     print('Finished Training')
