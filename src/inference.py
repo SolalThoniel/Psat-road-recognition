@@ -25,7 +25,6 @@ def inference(images, resolution, resnet_layers=34, training_epoch=5):
 
     # Device Selection
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
     # Loading Model
     net = None
     path = None
@@ -61,7 +60,8 @@ def inference(images, resolution, resnet_layers=34, training_epoch=5):
             net = resnet34()
             path = "../epochs/320x180/34/road_recognition_"+str(training_epoch - 1)+".pth"
 
-    net.load_state_dict(torch.load(path))
+    net.load_state_dict(torch.load(path, map_location=device))
+    #net.load_state_dict(torch.load(path))
     net = net.to(device)
 
     results = []
