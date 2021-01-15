@@ -94,7 +94,7 @@ class Data:
 if __name__ == '__main__':
     number_images = 10
 
-    data_loader = Data()
+    data_loader = Data(number_images)
     data_iter = iter(data_loader.train_loader)
     images, labels = data_iter.next()
     utils.imshow(torchvision.utils.make_grid(images))
