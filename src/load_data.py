@@ -13,20 +13,20 @@ from src import utils
 CLASSES_LABELS = ['piste-cyclable', 'route', 'sentier', 'trottoir', 'voie-partagee']
 
 DATASET_RESOLUTION_SMALL = {
-    'train_dir': '../data/classified-images-80x45/train_images',
-    'test_dir': '../data/classified-images-80x45/test_images',
+    'train_dir': '../data/classified_images_80x45/train_images',
+    'test_dir': '../data/classified_images_80x45/test_images',
     'padding': (74, 90, 73, 89),
     'resolution': '80x45'
 }
 DATASET_RESOLUTION_MEDIUM = {
-    'train_dir': '../data/classified-images-160x90/train_images',
-    'test_dir': '../data/classified-images-160x90/test_images',
+    'train_dir': '../data/classified_images_160x90/train_images',
+    'test_dir': '../data/classified_images_160x90/test_images',
     'padding': (32, 67),
     'resolution': '160x90'
 }
 DATASET_RESOLUTION_LARGE = {
-    'train_dir': '../data/classified-images-320x180/train_images',
-    'test_dir': '../data/classified-images-320x180/test_images',
+    'train_dir': '../data/classified_images_320x180/train_images',
+    'test_dir': '../data/classified_images_320x180/test_images',
     'padding': (0, 22),
     'resolution': '320x180'
 }
