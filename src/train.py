@@ -12,7 +12,7 @@ def run():
     batch_size = 10
     valid_size = 0.2
     dataset_resolution = DATASET_RESOLUTION_MEDIUM
-    resnet_layers = 101
+    resnet_layers = 50
     learning_rate = 0.01
     momentum = 0.9
     step_size = 5

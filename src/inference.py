@@ -8,7 +8,8 @@ from src.load_data import image_loader, DATASET_RESOLUTION_SMALL, DATASET_RESOLU
 # images = le tableau d'images
 # resolution = une des 3 constantes de résolution dans load_data.py
 # resnet_layers = le nombre de layers du réseau resnet (34, 50 ou 101)
-def inference(images, resolution, resnet_layers=34):
+# training_epoch = l'époque d'entrainement à choisir pour le modèle
+def inference(images, resolution, resnet_layers=34, training_epoch=5):
 
     # Put the images in a dataset
     images_transformed = []
@@ -32,42 +33,42 @@ def inference(images, resolution, resnet_layers=34):
     if resolution == DATASET_RESOLUTION_SMALL:
         if resnet_layers == 101:
             net = resnet101()
-            path = "../epochs/80x45/resnet101/road_recognition_5.pth"
+            path = "../epochs/80x45/101/road_recognition_"+str(training_epoch)+".pth"
         elif resnet_layers == 50:
             net = resnet50()
-            path = "../epochs/80x45/resnet50/road_recognition_5.pth"
+            path = "../epochs/80x45/50/road_recognition_"+str(training_epoch)+".pth"
         else:  # resnet_layer = 34
             net = resnet34()
-            path = "../epochs/80x45/resnet34/road_recognition_5.pth"
+            path = "../epochs/80x45/34/road_recognition_"+str(training_epoch)+".pth"
     elif resolution == DATASET_RESOLUTION_MEDIUM:
         if resnet_layers == 101:
             net = resnet101()
-            path = "../epochs/160x90/resnet101/road_recognition_5.pth"
+            path = "../epochs/160x90/101/road_recognition_"+str(training_epoch)+".pth"
         elif resnet_layers == 50:
             net = resnet50()
-            path = "../epochs/160x90/resnet50/road_recognition_5.pth"
+            path = "../epochs/160x90/50/road_recognition_"+str(training_epoch)+".pth"
         else:  # resnet_layer = 34
             net = resnet34()
-            path = "../epochs/160x90/resnet34/road_recognition_5.pth"
+            path = "../epochs/160x90/34/road_recognition_"+str(training_epoch)+".pth"
     elif resolution == DATASET_RESOLUTION_LARGE:
         if resnet_layers == 101:
             net = resnet101()
-            path = "../epochs/320x180/resnet101/road_recognition_5.pth"
+            path = "../epochs/320x180/101/road_recognition_"+str(training_epoch)+".pth"
         elif resnet_layers == 50:
             net = resnet50()
-            path = "../epochs/320x180/resnet50/road_recognition_5.pth"
+            path = "../epochs/320x180/50/road_recognition_"+str(training_epoch)+".pth"
         else:  # resnet_layer = 34
             net = resnet34()
-            path = "../epochs/320x180/resnet34/road_recognition_5.pth"
+            path = "../epochs/320x180/34/road_recognition_"+str(training_epoch - 1)+".pth"
 
     net.load_state_dict(torch.load(path))
-    net.to(device)
+    net = net.to(device)
 
     results = []
 
     with torch.no_grad():
         for image in images_transformed:
-            image.to(device)
+            image = image.to(device)
             outputs = net(image)
             _, predicted = torch.max(outputs, 1)
             results.append(CLASSES_LABELS[predicted])
