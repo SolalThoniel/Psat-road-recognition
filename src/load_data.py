@@ -15,7 +15,7 @@ CLASSES_LABELS = ['piste-cyclable', 'route', 'sentier', 'trottoir', 'voie-partag
 DATASET_RESOLUTION_SMALL = {
     'train_dir': '../data/classified_images_80x45/train_images',
     'test_dir': '../data/classified_images_80x45/test_images',
-    'padding': (74, 90, 73, 89),
+    'padding': (72, 90, 72, 89),
     'resolution': '80x45'
 }
 DATASET_RESOLUTION_MEDIUM = {
