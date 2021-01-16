@@ -16,6 +16,19 @@ from PIL import Image
 import torch.nn.functional as F
 
 
+def most_frequent(liste):
+    counter = 0
+    element = liste[0]
+
+    for i in liste:
+        curr_frequency = liste.count(i)
+        if (curr_frequency > counter):
+            counter = curr_frequency
+            element = i
+
+    return element
+
+
 def video_to_frames(video, resolution=DATASET_RESOLUTION_MEDIUM, resnet_layers=34, path_output_dir="../video_test/out"):
     # extract frames from a video and save to directory as 'x.png' where
     # x is the frame index
@@ -119,7 +132,7 @@ def edit_map(map_path,BBox):
             color = "red"
         if df.type[i]==2:
             color = "blue"
-        ax.plot([df.long[i-1],df.long[i]], [df.lat[i-1],df.lat[i]],linewidth=0.5, c=color)
+        ax.plot([df.long[i-1],df.long[i]], [df.lat[i-1],df.lat[i]],linewidth=1, c=color)
     ax.set_title('Cartographie des types de routes utilisées par des cyclistes')
     ax.set_xlim(BBox[0], BBox[1])
     ax.set_ylim(BBox[2], BBox[3])
@@ -128,7 +141,7 @@ def edit_map(map_path,BBox):
 
 def videodecoupetrace (video, coord, carte, BBox, resolution=DATASET_RESOLUTION_MEDIUM, resnet_layers=34):
     images = []
-    pas = 100
+    pas = 10
     vidcap = cv2.VideoCapture(video)
     count = 0
     num = 0
@@ -195,7 +208,7 @@ def videodecoupetrace (video, coord, carte, BBox, resolution=DATASET_RESOLUTION_
             sentier += 1
         elif result == "trottoir":
             trottoir += 1
-        elif result == "voie_partagee":
+        elif result == "voie-partagee":
             voie_partagee += 1
 
     print("nb piste-cyclable : " + str(piste_cyclable))
@@ -217,23 +230,29 @@ def videodecoupetrace (video, coord, carte, BBox, resolution=DATASET_RESOLUTION_
     pos = 1
     old = 0
     new = 0
+    temp = []
     for resultat in results[1:]:
-        new = int(ratio * taille * pos)
-        if resultat == "route":
-            color = "red"
-        if resultat == "piste-cyclable":
-            color = "blue"
-        if resultat == "sentier":
-            color = "green"
-        if resultat == "trottoir":
-            color = "yellow"
-        if resultat == "voie-partagee":
-            color = "pink"
-        ax.plot([df.data_lon[old], df.data_lon[new]], [df.data_lat[old], df.data_lat[new]], linewidth=0.5, c=color)
-        pos = pos+1
-        old = new
-        print(old)
-        print(new)
+        temp.append(resultat)
+        if pos % 30 == 0:
+            new = int(ratio * taille * pos)
+            voie = most_frequent(temp)
+            if resultat == "route":
+                color = "red"
+            if resultat == "piste-cyclable":
+                color = "blue"
+            if resultat == "sentier":
+                color = "brown"
+            if resultat == "trottoir":
+                color = "black"
+            if resultat == "voie-partagee":
+                color = "green"
+            ax.plot([df.data_lon[old], df.data_lon[new]], [df.data_lat[old], df.data_lat[new]], linewidth=1, c=color)
+
+            old = new
+            print(old)
+            print(new)
+            temp = []
+        pos = pos + 1
     ax.set_title('Cartographie des types de routes utilisées par des cyclistes')
     ax.set_xlim(BBox[0], BBox[1])
     ax.set_ylim(BBox[2], BBox[3])
@@ -246,5 +265,5 @@ if __name__=="__main__":
     carte = "../data/map2.png"
     #video_meta_data('../data/Ambre201906031831.avi')
     #video_to_frames(video, DATASET_RESOLUTION_MEDIUM, 50)
-    videodecoupetrace(video, coord, carte, [4.75070, 4.89753, 45.72506, 45.79354], DATASET_RESOLUTION_SMALL, 50)
+    videodecoupetrace(video, coord, carte, [4.75070, 4.89753, 45.72506, 45.79354], DATASET_RESOLUTION_SMALL, 1)
     #edit_map(carte, [4.75070, 4.89753, 45.72506, 45.79354])
