@@ -16,7 +16,7 @@ class reseau4(nn.Module):
             nn.Conv2d(64, 256, kernel_size=3, padding=(1, 0)),
             # 35*12
             nn.ReLU(inplace=True),
-            nn.AvgPool2d(kernel_size=3, stride=(2,1)),
+            nn.AvgPool2d(kernel_size=3, stride=(1,2)),
             # 17*10
             nn.Conv2d(256, 512, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),

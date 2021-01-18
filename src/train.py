@@ -96,7 +96,7 @@ def run():
         scheduler.step()
 
         path = '../epochs/'+dataset_resolution.get('resolution')+'/'+str(resnet_layers)+'/road_recognition_' + str(epoch) + '.pth'
-        #path = '../epochs/' + dataset_resolution.get('resolution') + '/' + "handmade" + '/road_recognition_' + str(epoch) + '.pth'
+        path = '../epochs/' + dataset_resolution.get('resolution') + '/' + "handmade" + '/road_recognition_' + str(epoch) + '.pth'
 
         torch.save(net.state_dict(), path)
 
