@@ -8,14 +8,28 @@ from torchsampler import ImbalancedDatasetSampler
 from PIL import Image
 from imgaug import augmenters as iaa
 
+
 from src import utils
+
+class Crop(object):
+
+   def __init__(self, height, width):
+
+        self.width = width
+        self.height = height
+
+   def __call__(self, img):
+       width, _ = img.size
+       return transforms.functional.crop(img, 15, 0, 30, 80)
+
 
 CLASSES_LABELS = ['piste-cyclable', 'route', 'sentier', 'trottoir', 'voie-partagee']
 
 DATASET_RESOLUTION_SMALL = {
     'train_dir': '../data/classified_images_80x45/train_images',
     'test_dir': '../data/classified_images_80x45/test_images',
-    'padding': (72, 90, 72, 89),
+    'padding': (0,0,0,0),
+    #'padding': (72, 90, 72, 89),
     'resolution': '80x45'
 }
 DATASET_RESOLUTION_MEDIUM = {
@@ -56,25 +70,81 @@ class ImgAugTransform:
 
 class Data:
 
-    def __init__(self, batch_size=4, valid_size=0.2, dataset_resolution=None):
+    def __init__(self, batch_size=4, valid_size=0.2, dataset_resolution=None, res=1, aug=True):
 
         if dataset_resolution is None:
-            dataset_resolution = DATASET_RESOLUTION_MEDIUM
+            dataset_resolution = DATASET_RESOLUTION_SMALL
 
         train_dir = dataset_resolution.get('train_dir')
         test_dir = dataset_resolution.get('test_dir')
 
-        train_transform = transforms.Compose([
+        train_transformAugCrop = transforms.Compose([
+            transforms.Pad(dataset_resolution.get('padding')),
+            Crop(0, 0),
+            transforms.RandomApply(torch.nn.ModuleList([
+            transforms.RandomRotation(degrees=(-10, 10)),
+            ]), p=0.4),
+            transforms.RandomApply(torch.nn.ModuleList([
+            torchvision.transforms.ColorJitter(brightness=0, contrast=0, saturation=0, hue=0),
+            ]), p=0.5),
+
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+        train_transformAug = transforms.Compose([
+            transforms.Pad(dataset_resolution.get('padding')),
+            transforms.RandomApply(torch.nn.ModuleList([
+                transforms.RandomRotation(degrees=(-10, 10)),
+            ]), p=0.4),
+            transforms.RandomApply(torch.nn.ModuleList([
+                torchvision.transforms.ColorJitter(brightness=0, contrast=0, saturation=0, hue=0),
+            ]), p=0.5),
+
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+        train_transformCrop = transforms.Compose([
+            transforms.Pad(dataset_resolution.get('padding')),
+            Crop(0, 0),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+        train_transformbase = transforms.Compose([
             transforms.Pad(dataset_resolution.get('padding')),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
 
-        test_transform = train_transform
+        test_transformCrop = transforms.Compose([
+            transforms.Pad(dataset_resolution.get('padding')),
+            Crop(0,0),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+        test_transform = transforms.Compose([
+            transforms.Pad(dataset_resolution.get('padding')),
+            Crop(0, 0),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+        if aug == True:
+            if res == 3:
+                train_transform = train_transformAugCrop
+                test_transform = test_transformCrop
+            else:
+                train_transform = train_transformAug
+        else:
+            if res == 3:
+                train_transform = train_transformCrop
+                test_transform = test_transformCrop
+            else :
+                train_transform = train_transformbase
+
+
+        #test_transform = train_transform
 
         train_data = torchvision.datasets.ImageFolder(train_dir, transform=train_transform)
         test_data = torchvision.datasets.ImageFolder(test_dir, transform=test_transform)
-
         num_train = len(train_data)
         indices_train = list(range(num_train))
         np.random.shuffle(indices_train)
@@ -92,11 +162,12 @@ class Data:
 
 
 if __name__ == '__main__':
-    number_images = 10
+    number_images = 2
 
     data_loader = Data(number_images)
     data_iter = iter(data_loader.train_loader)
     images, labels = data_iter.next()
+    img = ImgAugTransform()
     utils.imshow(torchvision.utils.make_grid(images))
     print('GroundTruth: ', ' '.join('%5s' % CLASSES_LABELS[labels[j]] for j in range(number_images)))
 

@@ -1,18 +1,24 @@
 import torch
+
 import torch.nn as nn
 import torch.optim as optim
 from torchvision.models import resnet34, resnet50, resnet101
 from src.load_data import Data, \
     DATASET_RESOLUTION_SMALL, DATASET_RESOLUTION_MEDIUM, DATASET_RESOLUTION_LARGE, CLASSES_LABELS
-
+from src.reseau import *
+from src.reseau2 import *
+from src.reseau3 import *
 
 def run():
     # Hyperparameters
     num_epochs = 10
-    batch_size = 10
+    batch_size = 5
     valid_size = 0.2
-    dataset_resolution = DATASET_RESOLUTION_MEDIUM
-    resnet_layers = 50
+    dataset_resolution = DATASET_RESOLUTION_SMALL
+    #resnet layer : 1->reseau / 2->reseau2 / 3->reseau3 / 34 - 50 - 101
+    resnet_layers = 3
+    #False or true si on veut ou pas de la data augmentation
+    dataaug = True
     learning_rate = 0.01
     momentum = 0.9
     step_size = 5
@@ -20,15 +26,21 @@ def run():
 
     # Device Selection
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+    #device = "cpu"
     # Loading Data
-    data_loader = Data(batch_size=batch_size, valid_size=valid_size, dataset_resolution=dataset_resolution)
+    data_loader = Data(batch_size=batch_size, valid_size=valid_size, dataset_resolution=dataset_resolution, res=resnet_layers, aug=dataaug)
 
     # Loading Model
     if resnet_layers == 50:
         net = resnet50()
     elif resnet_layers == 101:
         net = resnet101()
+    elif resnet_layers == 1:
+        net = reseau()
+    elif resnet_layers == 2:
+        net = reseau2()
+    elif resnet_layers == 3:
+        net = reseau3()
     else:
         net = resnet34()
     net.to(device)
@@ -81,7 +93,10 @@ def run():
         scheduler.step()
 
         path = '../epochs/'+dataset_resolution.get('resolution')+'/'+str(resnet_layers)+'/road_recognition_' + str(epoch) + '.pth'
+        #path = '../epochs/' + dataset_resolution.get('resolution') + '/' + "handmade" + '/road_recognition_' + str(epoch) + '.pth'
+
         torch.save(net.state_dict(), path)
+
 
     print('Finished Training')
 
