@@ -128,13 +128,13 @@ class Data:
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
         if aug == True:
-            if res == 3:
+            if res == 3 or res == 4:
                 train_transform = train_transformAugCrop
                 test_transform = test_transformCrop
             else:
                 train_transform = train_transformAug
         else:
-            if res == 3:
+            if res == 3 or res == 4:
                 train_transform = train_transformCrop
                 test_transform = test_transformCrop
             else :

@@ -8,6 +8,7 @@ from src.load_data import Data, \
 from src.reseau import *
 from src.reseau2 import *
 from src.reseau3 import *
+from src.reseau4 import *
 
 def run():
     # Hyperparameters
@@ -16,7 +17,7 @@ def run():
     valid_size = 0.2
     dataset_resolution = DATASET_RESOLUTION_SMALL
     #resnet layer : 1->reseau / 2->reseau2 / 3->reseau3 / 34 - 50 - 101
-    resnet_layers = 3
+    resnet_layers = 4
     #False or true si on veut ou pas de la data augmentation
     dataaug = True
     learning_rate = 0.01
@@ -41,6 +42,8 @@ def run():
         net = reseau2()
     elif resnet_layers == 3:
         net = reseau3()
+    elif resnet_layers == 4:
+        net = reseau4()
     else:
         net = resnet34()
     net.to(device)
