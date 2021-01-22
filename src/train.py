@@ -1,4 +1,5 @@
 import torch
+import time
 
 import torch.nn as nn
 import torch.optim as optim
@@ -11,13 +12,17 @@ from src.reseau3 import *
 from src.reseau4 import *
 
 def run():
+
+    timerBegin = time.time()
+    print(timerBegin)
+
     # Hyperparameters
     num_epochs = 10
     batch_size = 5
     valid_size = 0.2
     dataset_resolution = DATASET_RESOLUTION_SMALL
     #resnet layer : 1->reseau / 2->reseau2 / 3->reseau3 / 34 - 50 - 101
-    resnet_layers = 1
+    resnet_layers = 50
     #Dataaug entre 0 et 1 correspondant a la proba de caque modif
     dataaug = 0.3
     learning_rate = 0.01
@@ -100,7 +105,13 @@ def run():
 
         torch.save(net.state_dict(), path)
 
+    timerEnd = time.time()
+    duration = timerEnd-timerBegin
+    durationH = duration // 3600
+    durationM = (duration % 3600) // 60
+    durationS = ((duration % 3600) % 60)
 
+    print('Duration = ' + durationH + 'h ' + durationM + 'm ' + durationS + 's')
     print('Finished Training')
 
 
