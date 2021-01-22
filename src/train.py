@@ -14,7 +14,6 @@ from src.reseau4 import *
 def run():
 
     timerBegin = int(time.time())
-    print(timerBegin)
 
     # Hyperparameters
     num_epochs = 10
@@ -111,7 +110,7 @@ def run():
     durationM = (duration % 3600) // 60
     durationS = ((duration % 3600) % 60)
 
-    print('Duration = ' + durationH + 'h ' + durationM + 'm ' + durationS + 's')
+    print('Duration = ' + str(durationH) + 'h ' + str(durationM) + 'm ' + str(durationS) + 's')
     print('Finished Training')
 
 
