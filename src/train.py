@@ -13,12 +13,12 @@ from src.reseau4 import *
 
 def run():
 
-    timerBegin = time.time()
+    timerBegin = int(time.time())
     print(timerBegin)
 
     # Hyperparameters
     num_epochs = 10
-    batch_size = 5
+    batch_size = 10
     valid_size = 0.2
     dataset_resolution = DATASET_RESOLUTION_SMALL
     #resnet layer : 1->reseau / 2->reseau2 / 3->reseau3 / 34 - 50 - 101
@@ -105,7 +105,7 @@ def run():
 
         torch.save(net.state_dict(), path)
 
-    timerEnd = time.time()
+    timerEnd = int(time.time())
     duration = timerEnd-timerBegin
     durationH = duration // 3600
     durationM = (duration % 3600) // 60
