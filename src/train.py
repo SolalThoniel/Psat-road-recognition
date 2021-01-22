@@ -17,9 +17,9 @@ def run():
     valid_size = 0.2
     dataset_resolution = DATASET_RESOLUTION_SMALL
     #resnet layer : 1->reseau / 2->reseau2 / 3->reseau3 / 34 - 50 - 101
-    resnet_layers = 4
-    #False or true si on veut ou pas de la data augmentation
-    dataaug = True
+    resnet_layers = 1
+    #Dataaug entre 0 et 1 correspondant a la proba de caque modif
+    dataaug = 0.3
     learning_rate = 0.01
     momentum = 0.9
     step_size = 5

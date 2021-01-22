@@ -8,34 +8,35 @@ class reseau2(nn.Module):
         # appel du constructeur de l'ancêtre
         super(reseau2, self).__init__()
         self.features = nn.Sequential(
-            #80*45 en entrée
+            #160*90 en entrée
             nn.Conv2d(3,32, kernel_size=(9,9)),
-            #72*37
+            #152*82
             nn.ReLU(inplace=True),
-            nn.AvgPool2d(kernel_size=3, stride=(1,2)),
-            #35*35
+            nn.AvgPool2d(kernel_size=3, stride=(3)),
+            #50*27
             nn.Conv2d(32,64, kernel_size=5),
-            #31*31
+            #46*23
             nn.ReLU(inplace=True),
             nn.AvgPool2d(kernel_size=3, stride = 2),
-            #15*15
+            #22*11
             nn.Conv2d(64, 128, kernel_size=3),
+            #20*9
             nn.ReLU(inplace=True),
             nn.AvgPool2d(kernel_size=3, stride = 2)
-            #6*6
+            #4*9
         )
         self.classifier = nn.Sequential(
-            nn.Linear(128*6*6, 512),
+            nn.Linear(128*4*9, 1024),
+            nn.ReLU(inplace=True),
+            nn.Linear(1024, 512),
             nn.ReLU(inplace=True),
             nn.Linear(512, 5),
-            #nn.ReLU(inplace=True),
-            #nn.Linear(128, 5),
         )
 
     def forward(self, x):
         x = self.features(x)
         #print(x.size())
-        x = x.view(x.size(0), 128*6*6)
+        x = x.view(x.size(0), 128*9*4)
         x = self.classifier(x)
 
         return x
