@@ -1,27 +1,29 @@
 import torch
+import time
 
 import torch.nn as nn
 import torch.optim as optim
 from torchvision.models import resnet34, resnet50, resnet101
-from sklearn.metrics import confusion_matrix
-#import pylab as pl
 from src.load_data import Data, \
     DATASET_RESOLUTION_SMALL, DATASET_RESOLUTION_MEDIUM, DATASET_RESOLUTION_LARGE, CLASSES_LABELS
 from src.reseau import *
 from src.reseau2 import *
 from src.reseau3 import *
 from src.reseau4 import *
-import matplotlib.pyplot as plt
+
 def run():
+
+    timerBegin = int(time.time())
+
     # Hyperparameters
-    num_epochs = 2
-    batch_size = 5
+    num_epochs = 10
+    batch_size = 10
     valid_size = 0.2
     dataset_resolution = DATASET_RESOLUTION_SMALL
     #resnet layer : 1->reseau / 2->reseau2 / 3->reseau3 / 34 - 50 - 101
-    resnet_layers = 3
+    resnet_layers = 50
     #Dataaug entre 0 et 1 correspondant a la proba de caque modif
-    dataaug = 0.5
+    dataaug = 0.3
     learning_rate = 0.01
     momentum = 0.9
     step_size = 5
@@ -102,7 +104,13 @@ def run():
 
         torch.save(net.state_dict(), path)
 
+    timerEnd = int(time.time())
+    duration = timerEnd-timerBegin
+    durationH = duration // 3600
+    durationM = (duration % 3600) // 60
+    durationS = ((duration % 3600) % 60)
 
+    print('Duration = ' + str(durationH) + 'h ' + str(durationM) + 'm ' + str(durationS) + 's')
     print('Finished Training')
 
 
@@ -114,8 +122,6 @@ def inference(data_class: Data, net, device, mode='Validation'):
 
     class_correct = list(0. for i in range(5))
     class_total = list(0. for i in range(5))
-    sortie = []
-    classe = []
     with torch.no_grad():
         for i, data in enumerate(data_loader, 0):
             inputs, labels = data[0].to(device), data[1].to(device)
@@ -123,25 +129,10 @@ def inference(data_class: Data, net, device, mode='Validation'):
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
             for j in range(len(labels)):
-                sortie.append(predicted[j])
-                classe.append(labels[j])
                 label = labels[j]
                 class_correct[label] += c[j].item()
                 class_total[label] += 1
-    #print(sortie)
-    #print(classe)
-    cm = confusion_matrix(classe, sortie)
-    legende =  ["P-Cycl", "Route", "Sentier", "Trottoir", "V-Partagée"]
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    cax = ax.matshow(cm)
-    plt.title("Matrice de confusion")
-    fig.colorbar(cax)
-    ax.set_xticklabels(['']+ legende)
-    ax.set_yticklabels([''] + legende)
-    plt.xlabel("Prédiction")
-    plt.ylabel("Original")
-    plt.show()
+
     print('Accuracy of the network on the %d %s images: %d %%'
           % (sum(class_total), mode, 100 * sum(class_correct) / sum(class_total)))
 
