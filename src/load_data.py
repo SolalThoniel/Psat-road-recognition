@@ -86,16 +86,16 @@ class Data:
             transforms.RandomRotation(degrees=(-5, 5)),
             ]), p=aug),
             transforms.RandomApply(torch.nn.ModuleList([
-            torchvision.transforms.ColorJitter(brightness=0.2, contrast=0.0, saturation=0.0, hue=0),
+            torchvision.transforms.ColorJitter(brightness=0.7, contrast=0.0, saturation=0.0, hue=0),
             ]), p=aug),
             transforms.RandomApply(torch.nn.ModuleList([
-                torchvision.transforms.ColorJitter(brightness=0.0, contrast=0.1, saturation=0.0, hue=0.0),
+                torchvision.transforms.ColorJitter(brightness=0.0, contrast=0.7, saturation=0.0, hue=0.0),
             ]), p=aug),
             transforms.RandomApply(torch.nn.ModuleList([
-                torchvision.transforms.ColorJitter(brightness=0.0, contrast=0.0, saturation=0.1, hue=0),
+                torchvision.transforms.ColorJitter(brightness=0.0, contrast=0.0, saturation=0.7, hue=0),
             ]), p=aug),
             transforms.RandomApply(torch.nn.ModuleList([
-            torchvision.transforms.GaussianBlur(3, sigma=(0.2,0.7)),
+            torchvision.transforms.GaussianBlur(3, sigma=(0.2,1.5)),
             ]), p=aug),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
