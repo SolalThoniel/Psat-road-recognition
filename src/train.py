@@ -19,13 +19,13 @@ def run():
 
     # Hyperparameters
     num_epochs = 10
-    batch_size = 10
+    batch_size = 5
     valid_size = 0.2
     dataset_resolution = DATASET_RESOLUTION_SMALL
     #resnet layer : 1->reseau / 2->reseau2 / 3->reseau3 / 34 - 50 - 101
     resnet_layers = 3
     #Dataaug entre 0 et 1 correspondant a la proba de caque modif
-    dataaug = 0.3
+    dataaug = 0.4
     learning_rate = 0.01
     momentum = 0.9
     step_size = 5
@@ -94,10 +94,10 @@ def run():
                 running_loss = 0.0
 
         # Validation
-        inference(data_loader, net, device, mode='Validation')
+        inference(data_loader, net, device, mode='Validation', num_epochs=epoch)
 
         # Test
-        inference(data_loader, net, device, mode='Test')
+        inference(data_loader, net, device, mode='Test', num_epochs=epoch)
 
         scheduler.step()
 
@@ -116,7 +116,7 @@ def run():
     print('Finished Training')
 
 
-def inference(data_class: Data, net, device, mode='Validation'):
+def inference(data_class: Data, net, device, mode='Validation', num_epochs = 0):
     if mode == 'Validation':
         data_loader = data_class.valid_loader
     else:
@@ -133,8 +133,8 @@ def inference(data_class: Data, net, device, mode='Validation'):
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
             for j in range(len(labels)):
-                sortie.append(predicted[j])
-                classe.append(labels[j])
+                sortie.append(int(predicted[j]))
+                classe.append(int(labels[j]))
                 label = labels[j]
                 class_correct[label] += c[j].item()
                 class_total[label] += 1
@@ -144,7 +144,7 @@ def inference(data_class: Data, net, device, mode='Validation'):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     cax = ax.matshow(cm)
-    plt.title("Matrice de confusion")
+    plt.title("Matrice de confusion " + mode + " - Epochs " + str(num_epochs + 1))
     fig.colorbar(cax)
     ax.set_xticklabels([''] + legende)
     ax.set_yticklabels([''] + legende)
